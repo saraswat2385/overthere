@@ -29,7 +29,10 @@ import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
 import static com.xebialabs.overthere.ssh.SshJumpstationConnectionBuilder.SSH_JUMPSTATION_PROTOCOL;
-
+import net.schmizz.sshj.Config;
+import net.schmizz.sshj.DefaultConfig;
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.common.Factory;
 /**
  * Builds SSH jumpstation connections.
  */
@@ -45,6 +48,15 @@ public class SshJumpstationConnectionBuilder implements OverthereConnectionBuild
 
     public SshJumpstationConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
         connection = new SshTunnelConnection(type, options, mapper);
+        connection.sshClientFactory = new Factory<SSHClient>() {
+            @Override
+            public SSHClient create()
+            {
+                Config config = new DefaultConfig();
+                config.setWaitForServerIdentBeforeSendingClientIdent(true);
+                return new SSHClient(config);
+            }
+        };
     }
 
     @Override

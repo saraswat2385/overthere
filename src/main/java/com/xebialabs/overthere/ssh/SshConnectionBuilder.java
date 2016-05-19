@@ -29,6 +29,10 @@ import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import net.schmizz.sshj.Config;
+import net.schmizz.sshj.DefaultConfig;
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.common.Factory;
 
 /**
  * Builds SSH connections.
@@ -520,6 +524,15 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
             default:
                 throw new IllegalArgumentException("Unknown SSH connection type " + sshConnectionType);
         }
+        connection.sshClientFactory = new Factory<SSHClient>() {
+            @Override
+            public SSHClient create()
+            {
+                Config config = new DefaultConfig();
+                config.setWaitForServerIdentBeforeSendingClientIdent(true);
+                return new SSHClient(config);
+            }
+        };
     }
 
     @Override
